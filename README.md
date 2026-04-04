@@ -1,0 +1,356 @@
+# 🍔 FoodDash — Food Delivery Application
+
+A full-stack food delivery app built with **Spring Boot + React (Vite) + MySQL + JWT**.
+
+---
+
+## 📁 Project Structure
+
+```
+food-delivery/
+├── backend/                   # Spring Boot (Java 17)
+│   ├── pom.xml
+│   └── src/main/java/com/fooddelivery/
+│       ├── FoodDeliveryApplication.java
+│       ├── config/
+│       │   ├── SecurityConfig.java        # Spring Security + CORS
+│       │   └── GlobalExceptionHandler.java
+│       ├── controller/
+│       │   ├── AuthController.java        # /api/auth/**
+│       │   ├── RestaurantController.java  # /api/restaurants/**
+│       │   ├── MenuController.java        # /api/menu/**
+│       │   ├── CartController.java        # /api/cart/**
+│       │   └── OrderController.java       # /api/orders/**
+│       ├── dto/                           # Request/Response objects
+│       ├── entity/                        # JPA entities (DB tables)
+│       ├── repository/                    # Spring Data JPA repos
+│       ├── security/                      # JWT filter + utils
+│       └── service/                       # Business logic
+│
+├── frontend/                  # React 18 + Vite
+│   ├── package.json
+│   ├── vite.config.js
+│   └── src/
+│       ├── App.jsx            # Routes
+│       ├── index.css          # Global styles
+│       ├── api/
+│       │   ├── axios.js       # Axios instance with JWT interceptor
+│       │   └── services.js    # All API call functions
+│       ├── context/
+│       │   ├── AuthContext.jsx # Global auth state
+│       │   └── CartContext.jsx # Global cart count
+│       ├── components/
+│       │   ├── Navbar.jsx
+│       │   ├── ProtectedRoute.jsx
+│       │   ├── RestaurantCard.jsx
+│       │   └── MenuItemCard.jsx
+│       └── pages/
+│           ├── Login.jsx
+│           ├── Register.jsx
+│           ├── Home.jsx            # Restaurant listing
+│           ├── RestaurantMenu.jsx  # Menu by restaurant
+│           ├── Cart.jsx
+│           └── Orders.jsx
+│
+└── database_schema.sql        # MySQL schema + sample data
+```
+
+---
+
+## ⚙️ Prerequisites
+
+| Tool | Version |
+|------|---------|
+| Java | 17+ |
+| Maven | 3.8+ |
+| Node.js | 18+ |
+| MySQL | 8.0+ |
+
+---
+
+## 🚀 Setup Instructions
+
+### Step 1 — MySQL Database
+
+```bash
+# Login to MySQL
+mysql -u root -p
+
+# Option A: Let Spring Boot create tables automatically (recommended)
+CREATE DATABASE food_delivery_db;
+exit
+
+# Option B: Run the full schema with sample data
+mysql -u root -p < database_schema.sql
+```
+
+### Step 2 — Backend (Spring Boot)
+
+```bash
+cd backend
+
+# Update DB credentials if needed:
+# Edit src/main/resources/application.properties
+#   spring.datasource.username=root
+#   spring.datasource.password=YOUR_PASSWORD
+
+# Build and run
+mvn spring-boot:run
+
+# Backend starts on http://localhost:8080
+```
+
+### Step 3 — Frontend (React + Vite)
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Frontend starts on http://localhost:5173
+```
+
+### Step 4 — Load Sample Data (optional)
+
+If you used Option A above, seed the database:
+
+```bash
+mysql -u root -p food_delivery_db < database_schema.sql
+```
+
+---
+
+## 🌐 API Endpoints
+
+All protected endpoints require:  
+`Authorization: Bearer <JWT_TOKEN>` header
+
+### 🔐 Auth (`/api/auth`)
+
+| Method | Endpoint | Auth? | Description |
+|--------|----------|-------|-------------|
+| POST | `/api/auth/register` | ❌ | Register new user |
+| POST | `/api/auth/login` | ❌ | Login, returns JWT |
+| GET | `/api/auth/profile` | ✅ | Get current user profile |
+
+**Register body:**
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "secret123"
+}
+```
+
+**Login body:**
+```json
+{
+  "email": "john@example.com",
+  "password": "secret123"
+}
+```
+
+**Login response:**
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "token": "eyJhbGci...",
+    "email": "john@example.com",
+    "name": "John Doe",
+    "userId": 1
+  }
+}
+```
+
+---
+
+### 🏪 Restaurants (`/api/restaurants`)
+
+| Method | Endpoint | Auth? | Description |
+|--------|----------|-------|-------------|
+| GET | `/api/restaurants` | ✅ | List all restaurants |
+| GET | `/api/restaurants/{id}` | ✅ | Get one restaurant |
+| POST | `/api/restaurants` | ✅ | Add restaurant |
+| PUT | `/api/restaurants/{id}` | ✅ | Update restaurant |
+| DELETE | `/api/restaurants/{id}` | ✅ | Delete restaurant |
+
+**POST body:**
+```json
+{
+  "name": "Spice Garden",
+  "location": "MG Road, Bangalore",
+  "cuisineType": "Indian",
+  "rating": 4.5,
+  "deliveryTime": 25
+}
+```
+
+---
+
+### 🍽 Menu (`/api/menu`)
+
+| Method | Endpoint | Auth? | Description |
+|--------|----------|-------|-------------|
+| GET | `/api/menu/restaurant/{restaurantId}` | ✅ | Get restaurant menu |
+| POST | `/api/menu/restaurant/{restaurantId}` | ✅ | Add menu item |
+| PUT | `/api/menu/{id}` | ✅ | Update menu item |
+| DELETE | `/api/menu/{id}` | ✅ | Delete menu item |
+
+**POST body:**
+```json
+{
+  "name": "Butter Chicken",
+  "description": "Creamy tomato chicken curry",
+  "price": 320.00,
+  "category": "Main Course"
+}
+```
+
+---
+
+### 🛒 Cart (`/api/cart`)
+
+| Method | Endpoint | Auth? | Description |
+|--------|----------|-------|-------------|
+| GET | `/api/cart` | ✅ | Get user's cart |
+| POST | `/api/cart` | ✅ | Add item to cart |
+| PUT | `/api/cart/{id}?quantity=2` | ✅ | Update quantity |
+| DELETE | `/api/cart/{id}` | ✅ | Remove item |
+| DELETE | `/api/cart/clear` | ✅ | Empty cart |
+
+**POST body:**
+```json
+{
+  "menuItemId": 1,
+  "quantity": 2
+}
+```
+
+---
+
+### 📦 Orders (`/api/orders`)
+
+| Method | Endpoint | Auth? | Description |
+|--------|----------|-------|-------------|
+| POST | `/api/orders` | ✅ | Place order from cart |
+| GET | `/api/orders` | ✅ | Order history |
+| GET | `/api/orders/{id}` | ✅ | Get single order |
+
+**POST body:**
+```json
+{
+  "deliveryAddress": "123 Main St, Bangalore 560001"
+}
+```
+
+---
+
+## 🔑 How JWT Authentication Works
+
+```
+1. User POSTs to /api/auth/login with email+password
+2. Spring Security verifies credentials (BCrypt comparison)
+3. If valid → server generates JWT token (signed with secret key)
+4. Client stores token in localStorage
+5. Every subsequent request includes:
+   Authorization: Bearer <token>
+6. JwtAuthFilter intercepts the request:
+   - Extracts token from header
+   - Validates signature and expiry
+   - Sets authentication in Spring SecurityContext
+7. Controllers access authenticated user via @AuthenticationPrincipal
+```
+
+---
+
+## 🧪 Quick Test with cURL
+
+```bash
+# 1. Register
+curl -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test User","email":"test@test.com","password":"test123"}'
+
+# 2. Login (save the token!)
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@test.com","password":"test123"}'
+
+# 3. Use token (replace TOKEN below)
+TOKEN="eyJhbGci..."
+
+# Get restaurants
+curl http://localhost:8080/api/restaurants \
+  -H "Authorization: Bearer $TOKEN"
+
+# Add to cart
+curl -X POST http://localhost:8080/api/cart \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"menuItemId":1,"quantity":2}'
+
+# Place order
+curl -X POST http://localhost:8080/api/orders \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"deliveryAddress":"123 MG Road, Bangalore"}'
+```
+
+---
+
+## 🗄️ Database Tables
+
+```
+users          → id, name, email, password (BCrypt), role
+restaurants    → id, name, location, cuisine_type, rating, delivery_time
+menu_items     → id, restaurant_id (FK), name, description, price, category, available
+cart_items     → id, user_id (FK), menu_item_id (FK), quantity
+orders         → id, user_id (FK), total_amount, status, created_at, delivery_address, items_snapshot
+```
+
+---
+
+## 🧩 Architecture
+
+```
+Frontend (React)          Backend (Spring Boot)           Database
+─────────────────         ──────────────────────          ─────────
+React Pages         →     Controller Layer          →     MySQL
+  + Axios (JWT)           Service Layer
+  + Context API           Repository Layer (JPA)
+                          Security (JWT Filter)
+```
+
+---
+
+## 💡 Default Credentials (from sample data)
+
+| Email | Password | Role |
+|-------|----------|------|
+| admin@food.com | password123 | ADMIN |
+| test@food.com  | password123 | USER |
+
+---
+
+## 🔧 Common Issues
+
+**MySQL connection failed:**  
+→ Check `spring.datasource.password` in `application.properties`  
+→ Ensure MySQL is running: `sudo systemctl start mysql`
+
+**Port already in use:**  
+→ Change `server.port` in `application.properties`  
+→ Or kill the process: `lsof -ti:8080 | xargs kill`
+
+**CORS error in browser:**  
+→ Ensure React is running on port 5173  
+→ Check `SecurityConfig.java` allowed origins
+
+**JWT token expired:**  
+→ Login again to get a fresh token (valid for 24 hours by default)
