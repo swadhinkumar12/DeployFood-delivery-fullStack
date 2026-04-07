@@ -40,21 +40,19 @@ export default function Cart() {
     try {
       if (newQty <= 0) {
         await cartAPI.removeItem(cartItemId)
+        setCartItems(prev => prev.filter(i => i.id !== cartItemId))
       } else {
         await cartAPI.updateItem(cartItemId, newQty)
+        setCartItems(prev =>
+          prev.map(i => i.id === cartItemId ? { ...i, quantity: newQty } : i)
+        )
       }
-
-      // 🔥 ALWAYS REFRESH FROM BACKEND
-      const res = await cartAPI.getCart()
-      setCartItems(res.data.data || [])
-
       refreshCartCount()
-
-    } catch (err) {
-      console.error(err)
+    } catch {
       setError('Failed to update quantity.')
     }
   }
+
   const removeItem = async (cartItemId) => {
     try {
       await cartAPI.removeItem(cartItemId)
