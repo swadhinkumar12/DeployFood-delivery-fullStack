@@ -338,19 +338,107 @@ React Pages         →     Controller Layer          →     MySQL
 
 ---
 
+---
+
+## 🌍 Environment Variables
+
+All sensitive configuration uses **environment variables** (no hardcoding secrets!).
+
+### Create `.env` file (local development):
+
+```bash
+# Copy from .env.example
+cp .env.example .env
+
+# Edit .env with your values
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=food_delivery_db
+DB_USER=root
+DB_PASSWORD=your_password
+JWT_SECRET=your-super-secret-256-bit-key
+VITE_API_BASE_URL=http://localhost:8080/api
+```
+
+### Production (Railway/Cloud):
+
+Set these as **environment variables** in your deployment platform:
+- `DB_HOST` → Database host (auto-set by Railway MySQL)
+- `DB_PASSWORD` → Your database password
+- `JWT_SECRET` → Strong random 256-bit key (use a generator)
+- `CORS_ALLOWED_ORIGINS` → Your frontend domain
+- `VITE_API_BASE_URL` → Your backend API URL
+
+---
+
+## 🚀 Deploy to Railway (Production Ready)
+
+**Railway is perfect for portfolio projects!** Free tier, GitHub auto-deploy, live in minutes.
+
+### Quick Start:
+1. Push to GitHub: `git push origin main`
+2. [Open Railway](https://railway.app) → Connect GitHub repo
+3. Add MySQL service + Set environment variables
+4. Deploy! Backend and frontend auto-deploy.
+
+**Full guide:** See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) for step-by-step instructions.
+
+### What's Included:
+✅ Environment-based configuration  
+✅ Production Spring profile (no SQL logging, proper error handling)  
+✅ MySQL connection pooling (HikariCP)  
+✅ Frontend environment variable support  
+✅ `.gitignore` to protect secrets  
+
+---
+
 ## 🔧 Common Issues
 
 **MySQL connection failed:**  
-→ Check `spring.datasource.password` in `application.properties`  
-→ Ensure MySQL is running: `sudo systemctl start mysql`
+→ Check `DB_PASSWORD` in `.env` or environment variables  
+→ Ensure MySQL service is running
 
 **Port already in use:**  
-→ Change `server.port` in `application.properties`  
-→ Or kill the process: `lsof -ti:8080 | xargs kill`
+→ Set `JAVA_PORT` environment variable to different port  
+→ Or kill process: `netstat -ano | findstr :8080` (Windows)
 
 **CORS error in browser:**  
-→ Ensure React is running on port 5173  
-→ Check `SecurityConfig.java` allowed origins
+→ Frontend must be running (http://localhost:5173 for dev)  
+→ Update `CORS_ALLOWED_ORIGINS` for production domain
 
 **JWT token expired:**  
-→ Login again to get a fresh token (valid for 24 hours by default)
+→ Login again to get fresh token (24 hours by default)
+
+**Frontend shows "Cannot reach API":**  
+→ Check `VITE_API_BASE_URL` environment variable  
+→ Ensure backend is running and accessible
+
+---
+
+## 📝 Portfolio Highlights
+
+This project demonstrates:
+- **Full-stack development:** Spring Boot + React with shared API
+- **Authentication:** JWT-based stateless auth with Spring Security
+- **Database design:** Relational schema with proper FK relationships
+- **API design:** RESTful endpoints with proper HTTP status codes
+- **Security:** Password hashing (BCrypt), CORS configuration, role-based access
+- **Deployment:** Environment-based config, production-ready setup
+- **Best practices:** Service layer separation, global exception handling, DTO pattern
+
+---
+
+## 📚 Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | React 18 + Vite + Axios + React Router |
+| **Backend** | Spring Boot 3.2 + Spring Security + JPA |
+| **Database** | MySQL 8.0 |
+| **Authentication** | JWT (jjwt 0.11.5) |
+| **Styling** | CSS (custom, no framework) |
+| **Build** | Maven + npm |
+
+---
+
+**Built as a CSE fresher portfolio project** 🎓 — Ready to impress! 🚀

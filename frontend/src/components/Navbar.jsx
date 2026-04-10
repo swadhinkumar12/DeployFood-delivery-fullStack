@@ -42,6 +42,9 @@ export default function Navbar() {
               )}
             </Link>
             <Link to="/orders" className={isActive('/orders')}>Orders</Link>
+            {user.role === 'SELLER' && (
+              <Link to="/seller" className={isActive('/seller')}>Seller</Link>
+            )}
           </div>
         )}
 

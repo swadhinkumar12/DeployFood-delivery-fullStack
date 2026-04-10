@@ -4,6 +4,7 @@ import com.fooddelivery.dto.CartRequest;
 import com.fooddelivery.entity.CartItem;
 import com.fooddelivery.entity.MenuItem;
 import com.fooddelivery.entity.User;
+import com.fooddelivery.exception.ForbiddenOperationException;
 import com.fooddelivery.repository.CartItemRepository;
 import com.fooddelivery.repository.MenuItemRepository;
 import com.fooddelivery.repository.UserRepository;
@@ -84,7 +85,7 @@ public class CartService {
         // Security check
         User user = getUserByEmail(email);
         if (!cartItem.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized");
+            throw new ForbiddenOperationException("You cannot modify another user's cart item");
         }
 
         // Prevent negative values
@@ -111,7 +112,7 @@ public class CartService {
         // Security check
         User user = getUserByEmail(email);
         if (!cartItem.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized");
+            throw new ForbiddenOperationException("You cannot remove another user's cart item");
         }
 
         cartItemRepository.delete(cartItem);

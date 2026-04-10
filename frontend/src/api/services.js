@@ -42,3 +42,11 @@ export const orderAPI = {
   getHistory:  ()     => api.get('/orders'),
   getById:     (id)   => api.get(`/orders/${id}`),
 }
+
+// ─── SELLER ─────────────────────────────────────────────
+export const sellerAPI = {
+  getRestaurants: ()          => api.get('/seller/restaurants'),
+  getOrders:      ()          => api.get('/seller/orders'),
+  getMenu:        (restaurantId) => api.get(`/seller/restaurants/${restaurantId}/menu`),
+  updateStatus:   (id, status) => api.put(`/seller/orders/${id}/status`, { status }),
+}

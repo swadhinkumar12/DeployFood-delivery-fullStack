@@ -5,6 +5,9 @@ import com.fooddelivery.entity.Restaurant;
 import com.fooddelivery.service.RestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -40,24 +43,32 @@ public class RestaurantController {
 
     /** Add a new restaurant */
     @PostMapping
-    public ResponseEntity<ApiResponse> addRestaurant(@RequestBody Restaurant restaurant) {
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<ApiResponse> addRestaurant(
+            @RequestBody Restaurant restaurant,
+            @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(
-            ApiResponse.ok("Restaurant added", restaurantService.addRestaurant(restaurant)));
+            ApiResponse.ok("Restaurant added", restaurantService.addRestaurant(restaurant, userDetails.getUsername())));
     }
 
     /** Update restaurant details */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<ApiResponse> updateRestaurant(
             @PathVariable Long id,
-            @RequestBody Restaurant restaurant) {
+            @RequestBody Restaurant restaurant,
+            @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(
-            ApiResponse.ok("Restaurant updated", restaurantService.updateRestaurant(id, restaurant)));
+            ApiResponse.ok("Restaurant updated", restaurantService.updateRestaurant(id, restaurant, userDetails.getUsername())));
     }
 
     /** Delete a restaurant */
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteRestaurant(@PathVariable Long id) {
-        restaurantService.deleteRestaurant(id);
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<ApiResponse> deleteRestaurant(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        restaurantService.deleteRestaurant(id, userDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.ok("Restaurant deleted"));
     }
 }

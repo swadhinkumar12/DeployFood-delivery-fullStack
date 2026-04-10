@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { restaurantAPI, menuAPI } from '../api/services'
+import { getApiErrorMessage } from '../api/axios'
 import MenuItemCard from '../components/MenuItemCard'
 
 export default function RestaurantMenu() {
@@ -29,7 +30,7 @@ export default function RestaurantMenu() {
       setRestaurant(restRes.data.data)
       setMenuItems(menuRes.data.data || [])
     } catch (err) {
-      setError('Failed to load menu. Please try again.')
+      setError(getApiErrorMessage(err, 'Failed to load menu. Please try again.'))
     } finally {
       setLoading(false)
     }

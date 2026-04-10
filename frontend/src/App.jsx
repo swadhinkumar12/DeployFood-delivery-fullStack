@@ -14,11 +14,12 @@ import Home            from './pages/Home'
 import RestaurantMenu  from './pages/RestaurantMenu'
 import Cart            from './pages/Cart'
 import Orders          from './pages/Orders'
+import SellerDashboard from './pages/SellerDashboard'
 
 export default function App() {
   return (
     // BrowserRouter: enables client-side routing
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       {/* AuthProvider: global authentication state */}
       <AuthProvider>
         {/* CartProvider: global cart count state */}
@@ -44,6 +45,9 @@ export default function App() {
             } />
             <Route path="/orders" element={
               <ProtectedRoute><Orders /></ProtectedRoute>
+            } />
+            <Route path="/seller" element={
+              <ProtectedRoute><SellerDashboard /></ProtectedRoute>
             } />
 
             {/* Fallback: redirect unknown paths to home */}

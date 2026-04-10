@@ -49,7 +49,11 @@ public class AuthService {
         user.setEmail(request.getEmail());
         // Hash the password - NEVER store plain text
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole("USER");
+        String requestedRole = request.getRole() == null ? "USER" : request.getRole().trim().toUpperCase();
+        if (!requestedRole.equals("USER") && !requestedRole.equals("SELLER")) {
+            throw new RuntimeException("Invalid role. Allowed roles are USER and SELLER");
+        }
+        user.setRole(requestedRole);
 
         // Save to DB
         userRepository.save(user);
@@ -57,7 +61,7 @@ public class AuthService {
         // Generate JWT token for immediate login after registration
         String token = jwtUtil.generateToken(user.getEmail());
 
-        return new AuthResponse(token, user.getEmail(), user.getName(), user.getId());
+        return new AuthResponse(token, user.getEmail(), user.getName(), user.getId(), user.getRole());
     }
 
     /**
@@ -79,7 +83,7 @@ public class AuthService {
         // Generate JWT token
         String token = jwtUtil.generateToken(user.getEmail());
 
-        return new AuthResponse(token, user.getEmail(), user.getName(), user.getId());
+        return new AuthResponse(token, user.getEmail(), user.getName(), user.getId(), user.getRole());
     }
 
     /**

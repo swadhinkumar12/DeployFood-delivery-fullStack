@@ -35,6 +35,10 @@ public class MenuItem {
     @Column(nullable = false)
     private Double price;
 
+    // Item type: VEG or NON_VEG
+    @Column(nullable = false)
+    private String itemType = "VEG";
+
     // Category: e.g., "Starters", "Main Course", "Desserts"
     private String category;
 

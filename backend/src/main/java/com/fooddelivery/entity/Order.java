@@ -1,10 +1,15 @@
 package com.fooddelivery.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+
+import java.util.ArrayList;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Order entity - maps to 'orders' table
@@ -12,6 +17,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "orders")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,7 +30,12 @@ public class Order {
     // Which user placed this order
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "restaurant_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Restaurant restaurant;
 
     // Total price of the order
     @Column(nullable = false)
@@ -41,7 +52,6 @@ public class Order {
     // Delivery address for this order
     private String deliveryAddress;
 
-    // Store order items as JSON string (simple approach)
-    @Column(columnDefinition = "TEXT")
-    private String itemsSnapshot;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items = new ArrayList<>();
 }

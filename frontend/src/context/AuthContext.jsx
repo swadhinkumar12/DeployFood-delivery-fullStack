@@ -4,16 +4,23 @@
 
 import { createContext, useContext, useState, useEffect } from 'react'
 import { authAPI } from '../api/services'
+import { getApiErrorMessage } from '../api/axios'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   // Initialize from localStorage so user stays logged in on refresh
-  const [user, setUser]       = useState(() => {
-    const saved = localStorage.getItem('user')
-    return saved ? JSON.parse(saved) : null
-  })
   const [token, setToken]     = useState(() => localStorage.getItem('token') || null)
+  const [user, setUser]       = useState(() => {
+    const token = localStorage.getItem('token')
+    const saved = localStorage.getItem('user')
+    if (!token || !saved) return null
+    try {
+      return JSON.parse(saved)
+    } catch {
+      return null
+    }
+  })
   const [loading, setLoading] = useState(false)
 
   // Persist user to localStorage whenever it changes
@@ -24,20 +31,21 @@ export function AuthProvider({ children }) {
     } else {
       localStorage.removeItem('user')
       localStorage.removeItem('token')
+      if (user) setUser(null)
     }
   }, [user, token])
 
   /** Register new account */
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, role) => {
     setLoading(true)
     try {
-      const res = await authAPI.register({ name, email, password })
+      const res = await authAPI.register({ name, email, password, role })
       const { token: tok, ...userInfo } = res.data.data
       setToken(tok)
       setUser(userInfo)
       return { success: true }
     } catch (err) {
-      return { success: false, message: err.response?.data?.message || 'Registration failed' }
+      return { success: false, message: getApiErrorMessage(err, 'Registration failed') }
     } finally {
       setLoading(false)
     }
@@ -53,7 +61,7 @@ export function AuthProvider({ children }) {
       setUser(userInfo)
       return { success: true }
     } catch (err) {
-      return { success: false, message: err.response?.data?.message || 'Invalid credentials' }
+      return { success: false, message: getApiErrorMessage(err, 'Invalid credentials') }
     } finally {
       setLoading(false)
     }

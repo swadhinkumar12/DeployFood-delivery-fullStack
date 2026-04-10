@@ -1,0 +1,31 @@
+# Environment and IDE
+.env
+.env.local
+.env.*.local
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build outputs
+target/
+dist/
+build/
+node_modules/
+package-lock.json
+yarn.lock
+
+# Database
+*.sql.bak
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Frontend
+frontend/.vite
+frontend/coverage
+
+# Backend
+backend/.factorypath

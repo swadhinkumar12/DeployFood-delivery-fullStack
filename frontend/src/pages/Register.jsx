@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function Register() {
-  const [form, setForm]    = useState({ name: '', email: '', password: '', confirm: '' })
+  const [form, setForm]    = useState({ name: '', email: '', password: '', confirm: '', role: 'USER' })
   const [error, setError]  = useState('')
   const { register, loading } = useAuth()
   const navigate           = useNavigate()
@@ -24,7 +24,7 @@ export default function Register() {
       return
     }
 
-    const result = await register(form.name, form.email, form.password)
+    const result = await register(form.name, form.email, form.password, form.role)
     if (result.success) {
       navigate('/')
     } else {
@@ -39,7 +39,8 @@ export default function Register() {
         <div style={styles.header}>
           <div className="auth-logo">🍔</div>
           <h1 className="auth-title">Join ByToSoul</h1>
-          <p className="auth-subtitle">Create your account to start ordering</p>
+          <p className="auth-subtitle">Create your account to start ordering or selling</p>
+          <p style={styles.helperText}>Seller accounts do not need restaurant details here. You can add restaurants after logging in.</p>
         </div>
 
         {/* Error */}
@@ -98,6 +99,19 @@ export default function Register() {
               onChange={handleChange}
               required
             />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Account Type</label>
+            <select
+              className="form-input"
+              name="role"
+              value={form.role}
+              onChange={handleChange}
+            >
+              <option value="USER">Customer</option>
+              <option value="SELLER">Seller</option>
+            </select>
           </div>
 
           <button

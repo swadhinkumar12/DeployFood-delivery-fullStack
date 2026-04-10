@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react'
 import { orderAPI } from '../api/services'
+import { getApiErrorMessage } from '../api/axios'
 import { useNavigate } from 'react-router-dom'
 
 // Map status to color and label
@@ -27,8 +28,8 @@ export default function Orders() {
     try {
       const res = await orderAPI.getHistory()
       setOrders(res.data.data || [])
-    } catch {
-      setError('Failed to load orders.')
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Failed to load orders.'))
     } finally {
       setLoading(false)
     }
@@ -100,15 +101,27 @@ export default function Orders() {
                   </span>
                 </div>
 
+                {order.restaurant?.name && (
+                  <div style={styles.restaurantRow}>
+                    <span style={styles.restaurantLabel}>Restaurant</span>
+                    <span style={styles.restaurantValue}>{order.restaurant.name}</span>
+                  </div>
+                )}
+
                 <hr className="divider" />
 
-                {/* Order Items Snapshot */}
-                {order.itemsSnapshot && (
+                {/* Order Items */}
+                {Array.isArray(order.items) && order.items.length > 0 && (
                   <div style={styles.itemsSection}>
                     <p style={styles.itemsLabel}>Items ordered:</p>
                     <div style={styles.itemsList}>
-                      {order.itemsSnapshot.split(', ').map((item, idx) => (
-                        <span key={idx} style={styles.itemChip}>{item}</span>
+                      {order.items.map((item, idx) => (
+                        <span key={`${item.id || item.itemName}-${idx}`} style={styles.itemChip}>
+                          <span style={{ ...styles.typePill, background: item.itemType === 'NON_VEG' ? '#fff1f0' : '#eef7ee', color: item.itemType === 'NON_VEG' ? '#b71c1c' : '#2e7d32' }}>
+                            {item.itemType === 'NON_VEG' ? 'Non-Veg' : 'Veg'}
+                          </span>
+                          <span>{item.itemName} x{item.quantity}</span>
+                        </span>
                       ))}
                     </div>
                   </div>
@@ -154,6 +167,16 @@ const styles = {
     color: '#777770',
     marginTop: '4px',
   },
+  restaurantRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    gap: '12px',
+    padding: '10px 0 4px',
+    color: '#55554f',
+    fontSize: '0.9rem',
+  },
+  restaurantLabel: { color: '#777770' },
+  restaurantValue: { fontWeight: 600 },
   statusBadge: {
     padding: '6px 14px',
     borderRadius: '20px',
@@ -169,11 +192,16 @@ const styles = {
   itemsList: { display: 'flex', flexWrap: 'wrap', gap: '6px' },
   itemChip: {
     background: '#f5f5f0',
-    borderRadius: '6px',
+    borderRadius: '999px',
     padding: '4px 10px',
     fontSize: '0.83rem',
     color: '#444',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    flexWrap: 'wrap',
   },
+  typePill: { borderRadius: '999px', padding: '2px 8px', fontSize: '0.72rem', fontWeight: 700 },
   address: {
     fontSize: '0.88rem',
     color: '#555',

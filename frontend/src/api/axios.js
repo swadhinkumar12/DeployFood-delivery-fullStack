@@ -2,9 +2,14 @@
 // Centralized Axios instance — auto-attaches JWT to every request
 
 import axios from 'axios'
+import { API_BASE_URL } from '../config/apiConfig'
+
+export const getApiErrorMessage = (error, fallback = 'Something went wrong') => {
+  return error?.response?.data?.message || fallback
+}
 
 const api = axios.create({
-  baseURL: '/api', // Vite proxies /api → http://localhost:8080/api
+  baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
 })
 
@@ -24,7 +29,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 || error.response?.status === 403) {
       // Token expired or invalid — clear storage and go to login
       localStorage.removeItem('token')
       localStorage.removeItem('user')

@@ -28,9 +28,22 @@ export default function MenuItemCard({ item }) {
   return (
     <div className="menu-card">
       {/* Category badge */}
-      {item.category && (
-        <span className="menu-category">{item.category}</span>
-      )}
+      <div style={styles.badgeRow}>
+        {item.itemType && (
+          <span
+            style={{
+              ...styles.typeBadge,
+              background: item.itemType === 'NON_VEG' ? '#fff1f0' : '#eef7ee',
+              color: item.itemType === 'NON_VEG' ? '#b71c1c' : '#2e7d32',
+            }}
+          >
+            {item.itemType === 'NON_VEG' ? 'Non-Veg' : 'Veg'}
+          </span>
+        )}
+        {item.category && (
+          <span className="menu-category">{item.category}</span>
+        )}
+      </div>
 
       <div className="menu-body">
         <div style={styles.info}>
@@ -59,6 +72,14 @@ export default function MenuItemCard({ item }) {
 }
 
 const styles = {
+  badgeRow: { display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' },
+  typeBadge: {
+    borderRadius: '999px',
+    padding: '4px 10px',
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    letterSpacing: '0.02em',
+  },
   info: { marginBottom: '12px' },
   name: {
     fontSize: '1rem',
