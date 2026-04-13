@@ -33,8 +33,7 @@ api.interceptors.response.use(
       // Token expired or invalid — clear storage and go to login
       localStorage.removeItem('token')
       localStorage.removeItem('user')
-      const loginPath = import.meta.env.PROD ? '/#/login' : '/login'
-      window.location.assign(loginPath)
+      window.location.assign('/login')
     }
     return Promise.reject(error)
   }

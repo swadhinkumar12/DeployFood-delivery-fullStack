@@ -1,7 +1,7 @@
 // App.jsx
 // Root component — sets up router, context providers, and all routes
 
-import { BrowserRouter, HashRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -17,11 +17,9 @@ import Orders          from './pages/Orders'
 import SellerDashboard from './pages/SellerDashboard'
 
 export default function App() {
-  const Router = import.meta.env.PROD ? HashRouter : BrowserRouter
-
   return (
     // BrowserRouter: enables client-side routing
-    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       {/* AuthProvider: global authentication state */}
       <AuthProvider>
         {/* CartProvider: global cart count state */}
@@ -57,6 +55,6 @@ export default function App() {
           </Routes>
         </CartProvider>
       </AuthProvider>
-    </Router>
+    </BrowserRouter>
   )
 }
