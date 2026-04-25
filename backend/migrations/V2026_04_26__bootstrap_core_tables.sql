@@ -1,6 +1,9 @@
 -- Emergency bootstrap for production when Hibernate auto-DDL is not creating tables.
 -- Safe to run multiple times because of IF NOT EXISTS checks.
 
+CREATE DATABASE IF NOT EXISTS railway;
+USE railway;
+
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
